@@ -25,39 +25,60 @@
       background: var(--bg);
       color: var(--text);
       font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
-      overflow: hidden; /* VERY important */
+      overflow: hidden;
     }
 
     /* App shell */
     .app {
       display: grid;
       grid-template-rows: auto 1fr auto;
-      height: 100svh; /* better mobile viewport handling */
+      height: 100svh;
+      background: var(--bg);
+    }
+
+    header,
+    footer {
+      background: var(--bg);
+      transition: transform 0.35s ease, opacity 0.25s ease;
+      z-index: 10;
+      will-change: transform;
     }
 
     header {
-      padding: 1rem clamp(1rem, 4vw, 2.5rem);
-      background: var(--bg);
+      padding: 1rem clamp(1rem, 4vw, 3rem);
       border-bottom: 1px solid #21262d;
     }
 
     header h1 {
       margin: 0;
-      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
       color: var(--accent);
     }
 
     header p {
-      margin: 0.3rem 0 0;
+      margin: 0.4rem 0 0;
       font-size: 0.95rem;
       color: var(--muted);
-      max-width: 720px;
     }
 
-    /* Main game area */
+    footer {
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid #21262d;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Game area */
     .game-area {
       position: relative;
       background: var(--panel);
+      overflow: hidden;
     }
 
     iframe {
@@ -67,49 +88,68 @@
       display: block;
     }
 
-    footer {
-      padding: 0.6rem 1rem;
-      text-align: center;
-      font-size: 0.85rem;
+    /* Sentinel zones */
+    .sentinel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 28px;
+      z-index: 5;
+    }
+
+    .sentinel.top {
+      top: 0;
+    }
+
+    .sentinel.bottom {
+      bottom: 0;
+    }
+
+    /* Immersive mode */
+    .immersive header {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+
+    .immersive footer {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    /* Fullscreen hint (minimal, native-like) */
+    .hint {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
       color: var(--muted);
-      background: var(--bg);
-      border-top: 1px solid #21262d;
-    }
-
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Larger screens refinement */
-    @media (min-width: 900px) {
-      header,
-      footer {
-        padding-left: 4rem;
-        padding-right: 4rem;
-      }
+      opacity: 0.6;
+      pointer-events: none;
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
+  <div class="app" id="app">
     <header>
       <h1>🎮 Tic-Tac-Toe</h1>
-      <p>A fast, clean X vs O game built with React — optimized for all screen sizes.</p>
+      <p>Immersive X vs O — fullscreen native web experience.</p>
     </header>
 
-    <main class="game-area">
+    <main class="game-area" id="gameArea">
+      <!-- IntersectionObserver sentinels -->
+      <div class="sentinel top"></div>
+      <div class="sentinel bottom"></div>
+
       <iframe
         src="https://sam-in-tic-tac-toe.netlify.app/"
         title="Tic-Tac-Toe Game"
-        loading="eager"
-        allowfullscreen>
+        allowfullscreen
+        loading="eager">
       </iframe>
+
+      <div class="hint">Tap to enter fullscreen</div>
     </main>
 
     <footer>
@@ -119,5 +159,66 @@
       </a>
     </footer>
   </div>
+
+  <script>
+    const app = document.getElementById("app");
+    const gameArea = document.getElementById("gameArea");
+    const sentinels = document.querySelectorAll(".sentinel");
+
+    /* -------------------------------
+       IntersectionObserver (UI hide)
+    --------------------------------*/
+    let visibleCount = 0;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          visibleCount += entry.isIntersecting ? 1 : -1;
+        });
+
+        if (visibleCount > 0) {
+          app.classList.remove("immersive");
+        } else {
+          app.classList.add("immersive");
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    sentinels.forEach((el) => observer.observe(el));
+
+    /* -------------------------------
+       Fullscreen API
+    --------------------------------*/
+    function requestFullscreen() {
+      if (!document.fullscreenElement) {
+        gameArea.requestFullscreen?.().catch(() => {});
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    }
+
+    /* Enter fullscreen on first interaction */
+    gameArea.addEventListener("click", requestFullscreen);
+    gameArea.addEventListener("touchstart", requestFullscreen);
+
+    /* When exiting fullscreen, restore UI */
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        app.classList.remove("immersive");
+      }
+    });
+
+    /* ESC key safety */
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        exitFullscreen();
+      }
+    });
+  </script>
 </body>
 </html>
