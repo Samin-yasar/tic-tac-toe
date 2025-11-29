@@ -1,95 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tic-Tac-Toe | Samin Yasar</title>
+
   <style>
     :root {
-      --bg-dark: #0d1117;    
-      --accent: #2dd4bf;     
-      --text-light: #c9d1d9;
-      --card-bg: #161b22;
-      --shadow: 0 8px 20px rgba(0,0,0,0.6);
+      --bg: #0d1117;
+      --panel: #161b22;
+      --accent: #2dd4bf;
+      --text: #c9d1d9;
+      --muted: #8b949e;
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
       margin: 0;
-      padding: 0;
-      background: var(--bg-dark);
-      color: var(--text-light);
-      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+      overflow: hidden; /* VERY important */
     }
+
+    /* App shell */
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100svh; /* better mobile viewport handling */
+    }
+
     header {
-      text-align: center;
-      padding: 3rem 1rem 1.5rem;
+      padding: 1rem clamp(1rem, 4vw, 2.5rem);
+      background: var(--bg);
+      border-bottom: 1px solid #21262d;
     }
+
     header h1 {
-      font-size: 2.75rem;
       margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2rem);
       color: var(--accent);
     }
+
     header p {
-      font-size: 1.1rem;
-      color: #8b949e;
-      max-width: 600px;
-      margin: 0.5rem auto;
+      margin: 0.3rem 0 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 720px;
     }
-    .game-container {
-      width: 90%;
-      max-width: 640px;
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: var(--shadow);
-      margin: 2rem 0;
+
+    /* Main game area */
+    .game-area {
+      position: relative;
+      background: var(--panel);
     }
+
     iframe {
       width: 100%;
-      height: 600px;
+      height: 100%;
       border: none;
-      border-radius: 8px;
+      display: block;
     }
+
     footer {
+      padding: 0.6rem 1rem;
       text-align: center;
-      font-size: 0.9rem;
-      color: #8b949e;
-      padding: 2rem 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--bg);
+      border-top: 1px solid #21262d;
     }
+
     footer a {
       color: var(--accent);
       text-decoration: none;
     }
+
     footer a:hover {
       text-decoration: underline;
     }
-    @media (max-width: 600px) {
-      iframe {
-        height: 400px;
+
+    /* Larger screens refinement */
+    @media (min-width: 900px) {
+      header,
+      footer {
+        padding-left: 4rem;
+        padding-right: 4rem;
       }
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>🎮 Tic-Tac-Toe</h1>
-    <p>Enjoy a sleek game of X vs O — built with React and deployed on Netlify, seamlessly embedded into my portfolio.</p>
-  </header>
+  <div class="app">
+    <header>
+      <h1>🎮 Tic-Tac-Toe</h1>
+      <p>A fast, clean X vs O game built with React — optimized for all screen sizes.</p>
+    </header>
 
-  <div class="game-container">
-    <iframe
-      src="https://sam-in-tic-tac-toe.netlify.app/"
-      title="Tic-Tac-Toe Game by Samin Yasar"
-      allowfullscreen
-      loading="lazy">
-    </iframe>
+    <main class="game-area">
+      <iframe
+        src="https://sam-in-tic-tac-toe.netlify.app/"
+        title="Tic-Tac-Toe Game"
+        loading="eager"
+        allowfullscreen>
+      </iframe>
+    </main>
+
+    <footer>
+      Made with 💙 by
+      <a href="https://github.com/samin-yasar" target="_blank" rel="noopener">
+        Samin Yasar
+      </a>
+    </footer>
   </div>
-
-  <footer>
-    <p>Made with 💙 by <a href="https://github.com/samin-yasar" target="_blank" rel="noopener">Samin Yasar</a></p>
-  </footer>
 </body>
 </html>
